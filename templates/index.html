@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Hàng Hóa</title>
+</head>
+
+<body>
+
+    <h1>DANH SÁCH HÀNG HÓA</h1>
+
+    <table border="1">
+
+        <tr>
+            <th>Mã</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+        </tr>
+
+        {% for item in danh_sach %}
+
+        <tr>
+            <td>{{ item["ma_hang"] }}</td>
+            <td>{{ item["ten_hang"] }}</td>
+            <td>{{ item["gia"] }}</td>
+            <td>{{ item["so_luong"] }}</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+
+</html>
