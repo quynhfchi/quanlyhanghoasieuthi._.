@@ -1,0 +1,144 @@
+/* Màu nền tổng thể - Hồng pastel nhạt */
+body {
+    background-color: #fff0f3;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* ✅ Navbar */
+.navbar {
+    background-color: #ffb3ba; /* Đỏ pastel */
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* Khung chứa chính */
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ✅ Thiết kế Card */
+.card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+    border: 1px solid #ffe6ea;
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #ff8b94;
+    border-bottom: 2px dashed #ffb3ba;
+    padding-bottom: 10px;
+}
+
+/* ✅ Form Input */
+.input-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+input, select {
+    flex: 1;
+    padding: 12px;
+    border: 1.5px solid #ffdfd3;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #ffb3ba;
+    box-shadow: 0 0 5px rgba(255, 179, 186, 0.5);
+}
+
+/* ✅ Buttons */
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-submit {
+    background-color: #baffc9; /* Xanh lá pastel */
+    color: #2c7a3f;
+    width: 100%;
+    font-size: 16px;
+    padding: 15px;
+}
+.btn-submit:hover { background-color: #9df0b1; }
+
+.btn-edit {
+    background-color: #bae1ff; /* Xanh dương pastel */
+    color: #1c5b8e;
+}
+.btn-edit:hover { background-color: #9cd3ff; }
+
+.btn-delete {
+    background-color: #ffb3ba; /* Đỏ pastel */
+    color: #8c1c24;
+}
+.btn-delete:hover { background-color: #ff99a2; }
+
+/* ✅ Table Đẹp */
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ffdfd3;
+}
+
+th {
+    background-color: #fff0f3;
+    color: #ff8b94;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #fff9fa;
+}
+
+.badge {
+    background-color: #ffffba; /* Vàng pastel */
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #8c8c1c;
+}
+
+/* ✅ Responsive (Hiển thị tốt trên điện thoại) */
+@media (max-width: 768px) {
+    .input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

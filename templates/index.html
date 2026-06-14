@@ -1,37 +1,81 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Hàng Hóa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Hàng Hóa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
-    <h1>DANH SÁCH HÀNG HÓA</h1>
+    <nav class="navbar">
+        <h1>🛒 Siêu Thị Nhóm 2</h1>
+    </nav>
 
-    <table border="1">
+    <div class="container">
+        <div class="card form-card">
+            <h2>📦 Thêm Hàng Hóa Mới</h2>
+            <form id="addForm">
+                <div class="input-group">
+                    <input type="text" placeholder="Mã hàng (VD: TP01)" required>
+                    <input type="text" placeholder="Tên sản phẩm" required>
+                </div>
+                
+                <div class="input-group">
+                    <select required>
+                        <option value="" disabled selected>-- Chọn loại hàng --</option>
+                        <option value="ThucPham">Thực Phẩm</option>
+                        <option value="DienMay">Điện Máy</option>
+                        <option value="GiaDung">Gia Dụng</option>
+                    </select>
+                    <input type="number" placeholder="Số lượng" required>
+                    <input type="number" placeholder="Giá nhập (VNĐ)" required>
+                </div>
+                
+                <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
+            </form>
+        </div>
 
-        <tr>
-            <th>Mã</th>
-            <th>Tên</th>
-            <th>Giá</th>
-            <th>Số lượng</th>
-        </tr>
+        <div class="card table-card">
+            <h2>📋 Danh Sách Sản Phẩm</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Giá (VNĐ)</th>
+                            <th>Số Lượng</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>TP01</strong></td>
+                            <td>Sữa tươi TH True Milk</td>
+                            <td>30,000</td>
+                            <td><span class="badge">10</span></td>
+                            <td>
+                                <button class="btn-edit">✏️ Sửa</button>
+                                <button class="btn-delete">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>DM02</strong></td>
+                            <td>Tủ lạnh Samsung Inverter</td>
+                            <td>8,500,000</td>
+                            <td><span class="badge">5</span></td>
+                            <td>
+                                <button class="btn-edit">✏️ Sửa</button>
+                                <button class="btn-delete">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-        {% for item in danh_sach %}
-
-        <tr>
-            <td>{{ item["ma_hang"] }}</td>
-            <td>{{ item["ten_hang"] }}</td>
-            <td>{{ item["gia"] }}</td>
-            <td>{{ item["so_luong"] }}</td>
-        </tr>
-
-        {% endfor %}
-
-    </table>
-
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>
