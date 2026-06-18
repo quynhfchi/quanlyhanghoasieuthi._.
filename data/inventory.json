@@ -1,0 +1,22 @@
+[
+    {
+        "ma_hang": "TP01",
+        "ten_hang": "Sữa tươi",
+        "gia": 25000,
+        "so_luong": 10,
+        "loai_hang": "Thực phẩm"
+    },
+    {
+        "ma_hang": "DM01",
+        "ten_hang": "Quạt điện",
+        "gia": 500000,
+        "so_luong": 3,
+        "loai_hang": "Điện máy"
+    },
+    {
+        "ma_hang": "TP02",
+        "ten_hang": "Bánh mì",
+        "gia": 15000,
+        "so_luong": 20
+    }
+]
