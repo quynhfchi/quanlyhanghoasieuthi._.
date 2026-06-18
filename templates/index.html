@@ -3,212 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Hàng Hóa Siêu Thị</title>
+    <title>Hệ Thống Quản Lý Siêu Thị</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+        .sidebar-menu li { cursor: pointer; }
+    </style>
 </head>
 <body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">🏪 QUẢN LÝ HÀNG HÓA SIÊU THỊ </div>
+        <ul class="sidebar-menu">
+            <li class="menu-item active" onclick="switchTab('tab-quan-ly', this)"><a href="javascript:void(0)">📦 Quản Lý Kho Hàng</a></li>
+            <li class="menu-item" onclick="switchTab('tab-tim-kiem', this)"><a href="javascript:void(0)">🔍 Tìm Kiếm - Sắp Xếp</a></li>
+            <li class="menu-item" onclick="switchTab('tab-thong-ke', this)"><a href="javascript:void(0)">📊 Thống Kê Báo Cáo</a></li>
+        </ul>
+    </div>
+
     <div class="main-content">
-        <div class="card">
-            <h2>📦 Thêm Hàng Hóa Mới</h2>
-            <form id="addProductForm" class="form-row">
-                <div class="input-wrapper">
-                    <label>Mã hàng hóa</label>
-                    <input type="text" id="ma_hang" placeholder="Ví dụ: TP01, DM01..." required>
-                </div>
-                <div class="input-wrapper">
-                    <label>Tên sản phẩm</label>
-                    <input type="text" id="ten_hang" placeholder="Nhập tên sản phẩm" required>
-                </div>
-                <div class="input-wrapper">
-                    <label>Loại sản phẩm</label>
-                    <select id="loai_hang" onchange="handleTypeChange(this.value)" required>
-                        <option value="">-- Chọn loại hàng --</option>
-                        <option value="ThucPham">Thực phẩm</option>
-                        <option value="DienMay">Điện máy</option>
-                        <option value="GiaDung">Gia dụng</option>
-                    </select>
-                </div>
-                <div class="input-wrapper">
-                    <label>Số lượng tồn kho</label>
-                    <input type="number" id="so_luong" value="0" min="0" required>
-                </div>
-                <div class="input-wrapper">
-                    <label>Giá nhập khẩu (VNĐ)</label>
-                    <input type="number" id="gia_nhap" value="0" min="0" required>
-                </div>
-                <div class="input-wrapper" id="hsd_container" style="display: none;">
-                    <label>Hạn sử dụng</label>
-                    <input type="date" id="han_su_dung">
-                </div>
-                <div style="width: 100%; text-align: center; margin-top: 15px;">
+        <div id="tab-quan-ly" class="tab-section active">
+            <div class="card">
+                <h2>📦 Thêm Hàng Hóa Mới</h2>
+                <form id="addProductForm">
+                    <div class="form-row-2">
+                        <div class="input-wrapper">
+                            <label>Mã hàng hóa</label>
+                            <input type="text" id="ma_hang" placeholder="Ví dụ: TP01, DM01..." required>
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Tên sản phẩm</label>
+                            <input type="text" id="ten_hang" placeholder="Nhập tên sản phẩm" required>
+                        </div>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="input-wrapper">
+                            <label>Loại sản phẩm</label>
+                            <select id="loai_hang" onchange="handleTypeChange(this.value)" required>
+                                <option value="">-- Chọn loại hàng --</option>
+                                <option value="ThucPham">Thực phẩm</option>
+                                <option value="DienMay">Điện máy</option>
+                                <option value="GiaDung">Gia dụng</option>
+                            </select>
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Số lượng </label>
+                           <input type="number" id="so_luong" value="0" min="0" 
+       onfocus="if(this.value=='0') this.value='';" 
+       onblur="if(this.value=='') this.value='0';" required>
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Giá nhập khẩu (VNĐ)</label>
+                            <input type="number" id="gia_nhap" value="0" min="0" 
+       onfocus="if(this.value=='0') this.value='';" 
+       onblur="if(this.value=='') this.value='0';" required>
+                        </div>
+                    </div>
+                    <div class="form-row-2" id="hsd_container" style="display: none; margin-bottom: 20px;">
+                        <div class="input-wrapper">
+                            <label>Hạn sử dụng</label>
+                            <input type="date" id="han_su_dung">
+                        </div>
+                    </div>
+                        <div class="submit-container" style="text-align: center;">
                     <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
+                    <div id="messageBox" style="margin-top: 15px; font-weight: bold; font-size: 16px;"></div>
                 </div>
-            </form>
-        </div>
-
-        <div class="card">
-            <h2>🔍 Bộ Lọc Nâng Cao & Thao Tác Thuật Toán</h2>
-            <div style="display: flex; gap: 15px; align-items: flex-end;">
-                <div class="input-wrapper" style="flex: 1;">
-                    <label>Tìm kiếm theo</label>
-                    <select id="searchCriteria" onchange="executeSearch()">
-                        <option value="all">Tất cả thuộc tính</option>
-                        <option value="ma_hang">Mã số sản phẩm (Binary Search)</option>
-                        <option value="ten_hang">Tên sản phẩm (Linear Search)</option>
-                    </select>
-                </div>
-                <div class="input-wrapper" style="flex: 2;">
-                    <label>Từ khóa tìm kiếm</label>
-                    <input type="text" id="searchKeyword" placeholder="Nhập tên, mã để tra cứu..." oninput="executeSearch()">
-                </div>
-                <div class="input-wrapper" style="flex: 1.5;">
-                    <label>Sắp xếp danh sách (Merge Sort)</label>
-                    <select id="sortCriteria" onchange="executeSort()">
-                        <option value="gia_nhap-asc">Giá nhập tăng dần 📈</option>
-                        <option value="gia_nhap-desc">Giá nhập giảm dần 📉</option>
-                        <option value="so_luong-asc">Số lượng tồn kho tăng</option>
-                        <option value="so_luong-desc">Số lượng tồn kho giảm</option>
-                    </select>
-                </div>
+                </form>
             </div>
-        </div>
 
-        <div class="card table-card">
-            <h2>📋 Danh Sách Sản Phẩm Trong Kho</h2>
-            <div class="table-responsive">
-                <table class="styled-table" style="width: 100%; border-collapse: collapse;">
+            <div class="card">
+                <h2>📋 Danh Sách Sản Phẩm Hiện Tại</h2>
+                <table class="styled-table">
                     <thead>
                         <tr>
                             <th>Mã Hàng</th>
                             <th>Tên Sản Phẩm</th>
-                            <th>Giá Nhập (VNĐ)</th>
+                            <th>Giá Nhập</th>
                             <th>Số Lượng</th>
-                            <th>Hạn Sử Dụng</th>
-                            <th>Thao Tác Xử Lý</th>
+                            <th>Ngày Nhập</th>
+                            <th>Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
+                    {% if danh_sach %}
                         {% for item in danh_sach %}
-                        <tr class="{% if item.het_hang %}row-het-hang{% elif item.sap_het_han %}row-sap-het-han{% else %}row-normal{% endif %}">
+                        {% set loai_class = 'row-thuc-pham' if item.loai_hang == 'ThucPham' else ('row-dien-may' if item.loai_hang == 'DienMay' else 'row-gia-dung') %}
+                        <tr class="{{ loai_class }}">
                             <td><strong>{{ item.ma_hang }}</strong></td>
-                            <td>
-                                {{ item.ten_hang }}
-                                {% if item.het_hang %}
-                                    <span style="background-color: #cc0000; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">❌ Hết hàng!</span>
-                                {% elif item.sap_het_han %}
-                                    <span style="background-color: #ff9900; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">⚠️ Hạn ngắn!</span>
-                                {% endif %}
-                            </td>
+                            <td>{{ item.ten_hang }}</td>
                             <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
-                            <td><span class="badge">{{ item.so_luong }}</span></td>
-                            <td>{{ item.han_su_dung if item.han_su_dung else 'Không áp dụng' }}</td>
-                            <td>
-                                <button class="btn-edit" onclick="alert('Tính năng cập nhật mã {{ item.ma_hang }}')">📝 Sửa</button>
-                                <button class="btn-delete" onclick="alert('Tính năng xóa mã {{ item.ma_hang }}')">🗑️ Xóa</button>
+                            <td>{{ item.so_luong }}</td>
+                            <td>{{ item.ngay_nhap }}</td>
+                            <td class="action-cell">
+                                <button class="btn-action btn-edit" onclick="openEditModal('{{ item.ma_hang }}', '{{ item.ten_hang }}', {{ item.gia_nhap }})">✏️ Sửa</button>
+                                <button class="btn-action btn-delete" onclick="xoaHangHoa('{{ item.ma_hang }}')">🗑️ Xóa</button>
                             </td>
                         </tr>
                         {% endfor %}
-                    </tbody>
+                    {% else %}
+                        <tr><td colspan="6" style="text-align: center;">Chưa có sản phẩm.</td></tr>
+                    {% endif %}
+                </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div id="tab-tim-kiem" class="tab-section">
+            <div class="card">
+                <h2>🔍 Tìm Kiếm & Sắp Xếp</h2>
+            </div>
+        </div>
+
+        <div id="tab-thong-ke" class="tab-section">
+            <div class="card">
+                <h2>📊 Thống Kê Kho Hàng</h2>
+                <p>Sản phẩm sắp hết hạn: {{ thong_ke.sap_het_han_count }}</p>
+                <p>Mặt hàng bán chạy: {{ thong_ke.ban_chay }}</p>
             </div>
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
         function handleTypeChange(value) {
-            const hsdContainer = document.getElementById('hsd_container');
-            if (value === 'ThucPham') {
-                hsdContainer.style.display = 'block';
-                document.getElementById('han_su_dung').setAttribute('required', 'true');
-            } else {
-                hsdContainer.style.display = 'none';
-                document.getElementById('han_su_dung').removeAttribute('required');
-                document.getElementById('han_su_dung').value = '';
-            }
+            document.getElementById('hsd_container').style.display = (value === 'ThucPham') ? 'block' : 'none';
         }
 
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            
-            data.forEach(item => {
-                let rowClass = 'row-normal';
-                let statusTag = '';
-                
-                if (parseInt(item.so_luong) === 0) {
-                    rowClass = 'row-het-hang';
-                    statusTag = '<span style="background-color: #cc0000; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">❌ Hết hàng!</span>';
-                } else if (item.sap_het_han) {
-                    rowClass = 'row-sap-het-han';
-                    statusTag = '<span style="background-color: #ff9900; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">⚠️ Hạn ngắn!</span>';
-                }
-                
-                tbody.innerHTML += `
-                    <tr class="${rowClass}">
-                        <td><strong>${item.ma_hang}</strong></td>
-                        <td>${item.ten_hang} ${statusTag}</td>
-                        <td>${Number(item.gia_nhap).toLocaleString()} VNĐ</td>
-                        <td><span class="badge">${item.so_luong}</span></td>
-                        <td>${item.han_su_dung ? item.han_su_dung : 'Không áp dụng'}</td>
-                        <td>
-                            <button class="btn-edit" onclick="alert('Tính năng cập nhật mã ${item.ma_hang}')">📝 Sửa</button>
-                            <button class="btn-delete" onclick="alert('Tính năng xóa mã ${item.ma_hang}')">🗑️ Xóa</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+        function openEditModal(ma, ten, gia, loai) {
+    document.getElementById('edit_ma_hang').value = ma;
+    document.getElementById('edit_ten').value = ten;
+    document.getElementById('edit_gia').value = gia;
+    document.getElementById('edit_loai_hang').value = loai;
+    
+    // Hiện ô HSD nếu là thực phẩm
+    document.getElementById('edit_hsd_container').style.display = (loai === 'ThucPham') ? 'block' : 'none';
+    
+    document.getElementById('editModal').style.display = 'block';
+}
 
-        function executeSearch() {
-            const keyword = document.getElementById('searchKeyword').value;
-            const criteria = document.getElementById('searchCriteria').value;
-            
-            fetch('/api/sap-xep-tim-kiem', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'search', keyword: keyword, criteria: criteria })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) renderTable(res.data);
-            });
-        }
+function xoaHangHoa(ma) {
+    document.getElementById('delete_ma_hang_text').innerText = ma;
+    document.getElementById('delete_ma_hang_val').value = ma;
+    document.getElementById('deleteModal').style.display = 'block';
+}
 
-        function executeSort() {
-            const sortVal = document.getElementById('sortCriteria').value.split('-');
-            fetch('/api/sap-xep-tim-kiem', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'sort', tieu_chi: sortVal[0], kieu: sortVal[1] })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) renderTable(res.data);
-            });
-        }
+function dongModalXoa() { document.getElementById('deleteModal').style.display = 'none'; }
+async function luuSua() {
+    const ma = document.getElementById('edit_ma_hang').value;
+    
+    // Lấy giá trị và ép kiểu ngay tại đây
+    const data = {
+        ten_hang: document.getElementById('edit_ten').value,
+        gia_nhap: parseFloat(document.getElementById('edit_gia').value) || 0,
+        // Dùng || 0 để đảm bảo nếu ô trống thì gửi số 0
+        nhap_them: parseInt(document.getElementById('edit_nhap_them').value) || 0,
+        xuat_ban: parseInt(document.getElementById('edit_xuat_ban').value) || 0
+    };
 
-        document.getElementById('addProductForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const payload = {
-                ma_hang: document.getElementById('ma_hang').value,
-                ten_hang: document.getElementById('ten_hang').value,
-                loai_hang: document.getElementById('loai_hang').value,
-                so_luong: document.getElementById('so_luong').value,
-                gia_nhap: document.getElementById('gia_nhap').value,
-                han_su_dung: document.getElementById('han_su_dung').value || null
-            };
-
-            fetch('/api/hang-hoa', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) window.location.reload();
-                else alert("Lỗi: " + res.message);
-            });
+    try {
+        const response = await fetch(`/api/hang-hoa/${ma}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Cập nhật thành công!");
+            location.reload(); 
+        } else {
+            alert("Lỗi: " + result.message); // Hiển thị lỗi từ server trả về
+        }
+    } catch (error) {
+        console.error("Lỗi kết nối:", error);
+        alert("Không thể kết nối tới máy chủ.");
+    }
+}
     </script>
+
+    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div class="modal-content" style="margin:5% auto; width:400px;">
+        <h3>✏️ Chỉnh sửa sản phẩm</h3>
+        <input type="hidden" id="edit_ma_hang">
+        <input type="hidden" id="edit_loai_hang"> <label>Tên sản phẩm:</label> <input type="text" id="edit_ten">
+        <label>Giá nhập:</label> <input type="number" id="edit_gia">
+        
+        <div id="edit_hsd_container" style="display:none;">
+            <label>Hạn sử dụng mới:</label> <input type="date" id="edit_hsd">
+        </div>
+
+        <label>Nhập thêm:</label> 
+        <input type="number" id="edit_nhap_them" value="" placeholder="0" onfocus="this.value=''">
+        
+        <label>Xuất bán:</label> 
+        <input type="number" id="edit_xuat_ban" value="" placeholder="0" onfocus="this.value=''">
+        
+        <div style="text-align:right; margin-top:15px;">
+            <button onclick="dongModal()" class="btn-pill" style="background:#eee;">❌ Hủy</button>
+            <button onclick="luuSua()" class="btn-pill" style="background:#4CAF50; color:white;">💾 Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div class="modal-content" style="margin:15% auto; width:300px; text-align:center;">
+        <h3 style="color: #ff4d4d;">⚠️ Xác nhận xóa</h3>
+        <p>Bạn muốn xóa sản phẩm <strong id="delete_ma_hang_text"></strong>?</p>
+        <input type="hidden" id="delete_ma_hang_val">
+        <button onclick="dongModalXoa()" class="btn-pill" style="background:#eee;">Không</button>
+        <button onclick="thucHienXoa()" class="btn-pill" style="background:#ff4d4d; color:white;">Xóa ngay</button>
+    </div>
+</div>
 </body>
 </html>

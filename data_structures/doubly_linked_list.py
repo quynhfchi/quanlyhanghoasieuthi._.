@@ -87,3 +87,31 @@ class DoublyLinkedList:
         while current and current.next:
             current = current.next
         self.tail = current
+    def delete_by_id(self, ma_hang):
+        current = self.head
+        while current:
+            if current.data.get("ma_hang") == ma_hang:
+                # Nếu là node đầu
+                if current == self.head:
+                    self.head = current.next
+                    if self.head: self.head.prev = None
+                # Nếu là node cuối
+                elif current == self.tail:
+                    self.tail = current.prev
+                    self.tail.next = None
+                # Nếu ở giữa
+                else:
+                    current.prev.next = current.next
+                    current.next.prev = current.prev
+                return True
+            current = current.next
+        return False
+
+    def update_by_id(self, ma_hang, new_data):
+        current = self.head
+        while current:
+            if current.data.get("ma_hang") == ma_hang:
+                current.data = new_data
+                return True
+            current = current.next
+        return False
