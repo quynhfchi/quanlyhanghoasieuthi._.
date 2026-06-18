@@ -15,21 +15,20 @@
     <div class="container">
         <div class="card form-card">
             <h2>📦 Thêm Hàng Hóa Mới</h2>
-            <form id="addForm">
-                <div class="input-group">
-                    <input type="text" placeholder="Mã hàng (VD: TP01)" required>
-                    <input type="text" placeholder="Tên sản phẩm" required>
+            <form id="addForm"> <div class="input-group">
+                    <input type="text" id="ma_hang" placeholder="Mã hàng (VD: TP01)" required>
+                    <input type="text" id="ten_hang" placeholder="Tên sản phẩm" required>
                 </div>
                 
                 <div class="input-group">
-                    <select required>
+                    <select id="loai_hang" required>
                         <option value="" disabled selected>-- Chọn loại hàng --</option>
                         <option value="ThucPham">Thực Phẩm</option>
                         <option value="DienMay">Điện Máy</option>
                         <option value="GiaDung">Gia Dụng</option>
                     </select>
-                    <input type="number" placeholder="Số lượng" required>
-                    <input type="number" placeholder="Giá nhập (VNĐ)" required>
+                    <input type="number" id="so_luong" placeholder="Số lượng" required>
+                    <input type="number" id="gia_nhap" placeholder="Giá nhập (VNĐ)" required>
                 </div>
                 
                 <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
@@ -50,26 +49,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for item in danh_sach %}
                         <tr>
-                            <td><strong>TP01</strong></td>
-                            <td>Sữa tươi TH True Milk</td>
-                            <td>30,000</td>
-                            <td><span class="badge">10</span></td>
+                            <td><strong>{{ item.ma_hang }}</strong></td>
+                            <td>{{ item.ten_hang }}</td>
+                            <td>{{ item.gia_nhap }}</td> 
+                            <td><span class="badge">{{ item.so_luong }}</span></td>
                             <td>
                                 <button class="btn-edit">✏️ Sửa</button>
                                 <button class="btn-delete">🗑️ Xóa</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td><strong>DM02</strong></td>
-                            <td>Tủ lạnh Samsung Inverter</td>
-                            <td>8,500,000</td>
-                            <td><span class="badge">5</span></td>
-                            <td>
-                                <button class="btn-edit">✏️ Sửa</button>
-                                <button class="btn-delete">🗑️ Xóa</button>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
