@@ -3,61 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Hàng Hóa</title>
+    <title>Hệ Thống Quản Lý Hàng Hóa Siêu Thị</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-    <nav class="navbar">
-        <h1>🛒 Cửa Hàng Bách Hóa Siêu Thị</h1>
-    </nav>
-
-    <div class="container">
-        <div class="card form-card">
+    <div class="main-content">
+        <div class="card">
             <h2>📦 Thêm Hàng Hóa Mới</h2>
-            <form id="addForm"> <div class="input-group">
-                    <input type="text" id="ma_hang" placeholder="Mã hàng (VD: TP01)" required>
-                    <input type="text" id="ten_hang" placeholder="Tên sản phẩm" required>
+            <form id="addProductForm" class="form-row">
+                <div class="input-wrapper">
+                    <label>Mã hàng hóa</label>
+                    <input type="text" id="ma_hang" placeholder="Ví dụ: TP01, DM01..." required>
                 </div>
-                
-                <div class="input-group">
-                    <select id="loai_hang" required>
-                        <option value="" disabled selected>-- Chọn loại hàng --</option>
-                        <option value="ThucPham">Thực Phẩm</option>
-                        <option value="DienMay">Điện Máy</option>
-                        <option value="GiaDung">Gia Dụng</option>
+                <div class="input-wrapper">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="ten_hang" placeholder="Nhập tên sản phẩm" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>Loại sản phẩm</label>
+                    <select id="loai_hang" onchange="handleTypeChange(this.value)" required>
+                        <option value="">-- Chọn loại hàng --</option>
+                        <option value="ThucPham">Thực phẩm</option>
+                        <option value="DienMay">Điện máy</option>
+                        <option value="GiaDung">Gia dụng</option>
                     </select>
-                    <input type="number" id="so_luong" placeholder="Số lượng" required>
-                    <input type="number" id="gia_nhap" placeholder="Giá nhập (VNĐ)" required>
                 </div>
-                
-                <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
+                <div class="input-wrapper">
+                    <label>Số lượng tồn kho</label>
+                    <input type="number" id="so_luong" value="0" min="0" required>
+                </div>
+                <div class="input-wrapper">
+                    <label>Giá nhập khẩu (VNĐ)</label>
+                    <input type="number" id="gia_nhap" value="0" min="0" required>
+                </div>
+                <div class="input-wrapper" id="hsd_container" style="display: none;">
+                    <label>Hạn sử dụng</label>
+                    <input type="date" id="han_su_dung">
+                </div>
+                <div style="width: 100%; text-align: center; margin-top: 15px;">
+                    <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
+                </div>
             </form>
         </div>
 
+        <div class="card">
+            <h2>🔍 Bộ Lọc Nâng Cao & Thao Tác Thuật Toán</h2>
+            <div style="display: flex; gap: 15px; align-items: flex-end;">
+                <div class="input-wrapper" style="flex: 1;">
+                    <label>Tìm kiếm theo</label>
+                    <select id="searchCriteria" onchange="executeSearch()">
+                        <option value="all">Tất cả thuộc tính</option>
+                        <option value="ma_hang">Mã số sản phẩm (Binary Search)</option>
+                        <option value="ten_hang">Tên sản phẩm (Linear Search)</option>
+                    </select>
+                </div>
+                <div class="input-wrapper" style="flex: 2;">
+                    <label>Từ khóa tìm kiếm</label>
+                    <input type="text" id="searchKeyword" placeholder="Nhập tên, mã để tra cứu..." oninput="executeSearch()">
+                </div>
+                <div class="input-wrapper" style="flex: 1.5;">
+                    <label>Sắp xếp danh sách (Merge Sort)</label>
+                    <select id="sortCriteria" onchange="executeSort()">
+                        <option value="gia_nhap-asc">Giá nhập tăng dần 📈</option>
+                        <option value="gia_nhap-desc">Giá nhập giảm dần 📉</option>
+                        <option value="so_luong-asc">Số lượng tồn kho tăng</option>
+                        <option value="so_luong-desc">Số lượng tồn kho giảm</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="card table-card">
-            <h2>📋 Danh Sách Sản Phẩm</h2>
+            <h2>📋 Danh Sách Sản Phẩm Trong Kho</h2>
             <div class="table-responsive">
-                <table>
+                <table class="styled-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
-                            <th>Mã</th>
+                            <th>Mã Hàng</th>
                             <th>Tên Sản Phẩm</th>
-                            <th>Giá (VNĐ)</th>
+                            <th>Giá Nhập (VNĐ)</th>
                             <th>Số Lượng</th>
-                            <th>Thao Tác</th>
+                            <th>Hạn Sử Dụng</th>
+                            <th>Thao Tác Xử Lý</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tableBody">
                         {% for item in danh_sach %}
-                        <tr>
+                        <tr class="{% if item.het_hang %}row-het-hang{% elif item.sap_het_han %}row-sap-het-han{% else %}row-normal{% endif %}">
                             <td><strong>{{ item.ma_hang }}</strong></td>
-                            <td>{{ item.ten_hang }}</td>
-                            <td>{{ item.gia_nhap }}</td> 
-                            <td><span class="badge">{{ item.so_luong }}</span></td>
                             <td>
-                                <button class="btn-edit">✏️ Sửa</button>
-                                <button class="btn-delete">🗑️ Xóa</button>
+                                {{ item.ten_hang }}
+                                {% if item.het_hang %}
+                                    <span style="background-color: #cc0000; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">❌ Hết hàng!</span>
+                                {% elif item.sap_het_han %}
+                                    <span style="background-color: #ff9900; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">⚠️ Hạn ngắn!</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
+                            <td><span class="badge">{{ item.so_luong }}</span></td>
+                            <td>{{ item.han_su_dung if item.han_su_dung else 'Không áp dụng' }}</td>
+                            <td>
+                                <button class="btn-edit" onclick="alert('Tính năng cập nhật mã {{ item.ma_hang }}')">📝 Sửa</button>
+                                <button class="btn-delete" onclick="alert('Tính năng xóa mã {{ item.ma_hang }}')">🗑️ Xóa</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -67,6 +114,101 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function handleTypeChange(value) {
+            const hsdContainer = document.getElementById('hsd_container');
+            if (value === 'ThucPham') {
+                hsdContainer.style.display = 'block';
+                document.getElementById('han_su_dung').setAttribute('required', 'true');
+            } else {
+                hsdContainer.style.display = 'none';
+                document.getElementById('han_su_dung').removeAttribute('required');
+                document.getElementById('han_su_dung').value = '';
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                let rowClass = 'row-normal';
+                let statusTag = '';
+                
+                if (parseInt(item.so_luong) === 0) {
+                    rowClass = 'row-het-hang';
+                    statusTag = '<span style="background-color: #cc0000; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">❌ Hết hàng!</span>';
+                } else if (item.sap_het_han) {
+                    rowClass = 'row-sap-het-han';
+                    statusTag = '<span style="background-color: #ff9900; color: white; padding: 2px 6px; font-size: 11px; border-radius: 4px; margin-left: 5px;">⚠️ Hạn ngắn!</span>';
+                }
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td><strong>${item.ma_hang}</strong></td>
+                        <td>${item.ten_hang} ${statusTag}</td>
+                        <td>${Number(item.gia_nhap).toLocaleString()} VNĐ</td>
+                        <td><span class="badge">${item.so_luong}</span></td>
+                        <td>${item.han_su_dung ? item.han_su_dung : 'Không áp dụng'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="alert('Tính năng cập nhật mã ${item.ma_hang}')">📝 Sửa</button>
+                            <button class="btn-delete" onclick="alert('Tính năng xóa mã ${item.ma_hang}')">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function executeSearch() {
+            const keyword = document.getElementById('searchKeyword').value;
+            const criteria = document.getElementById('searchCriteria').value;
+            
+            fetch('/api/sap-xep-tim-kiem', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'search', keyword: keyword, criteria: criteria })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) renderTable(res.data);
+            });
+        }
+
+        function executeSort() {
+            const sortVal = document.getElementById('sortCriteria').value.split('-');
+            fetch('/api/sap-xep-tim-kiem', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'sort', tieu_chi: sortVal[0], kieu: sortVal[1] })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) renderTable(res.data);
+            });
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const payload = {
+                ma_hang: document.getElementById('ma_hang').value,
+                ten_hang: document.getElementById('ten_hang').value,
+                loai_hang: document.getElementById('loai_hang').value,
+                so_luong: document.getElementById('so_luong').value,
+                gia_nhap: document.getElementById('gia_nhap').value,
+                han_su_dung: document.getElementById('han_su_dung').value || null
+            };
+
+            fetch('/api/hang-hoa', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) window.location.reload();
+                else alert("Lỗi: " + res.message);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,49 @@
+[
+    {
+        "ma_hang": "TP01",
+        "ten_hang": "Sữa tươi tiệt trùng",
+        "loai_hang": "ThucPham",
+        "so_luong": 100,
+        "gia_nhap": 30000,
+        "da_ban": 85,
+        "ngay_nhap": "2026-06-01",
+        "han_su_dung": "2026-06-25",
+        "sap_het_han": true,
+        "het_hang": false
+    },
+    {
+        "ma_hang": "DM01",
+        "ten_hang": "Tủ lạnh Inverter",
+        "loai_hang": "DienMay",
+        "so_luong": 5,
+        "gia_nhap": 12000000,
+        "da_ban": 3,
+        "ngay_nhap": "2026-05-10",
+        "han_su_dung": null,
+        "sap_het_han": false,
+        "het_hang": false
+    },
+    {
+        "ma_hang": "GD01",
+        "ten_hang": "Chảo chống dính Kangaroo",
+        "loai_hang": "GiaDung",
+        "so_luong": 0,
+        "gia_nhap": 250000,
+        "da_ban": 2,
+        "ngay_nhap": "2026-06-14",
+        "han_su_dung": null,
+        "sap_het_han": false,
+        "het_hang": true
+    },
+    {
+        "ma_hang": "TP03",
+        "ten_hang": "Dầu đậu nành Simplus",
+        "loai_hang": "ThucPham",
+        "so_luong": 20,
+        "gia_nhap": 45000.0,
+        "ngay_san_xuat": "2025-06-18",
+        "han_su_dung": "2026-06-18",
+        "ngay_nhap": "2026-06-18",
+        "da_ban": 0
+    }
+]
