@@ -1,20 +1,34 @@
-// Đợi HTML tải xong mới chạy Script
-document.addEventListener("DOMContentLoaded", function() {
-    
-    // Tìm tất cả các nút Xóa trên giao diện
-    const deleteButtons = document.querySelectorAll(".btn-delete");
+document.getElementById('addForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Ngăn việc tải lại trang mặc định của form
 
-    // Thêm sự kiện click cho từng nút
-    deleteButtons.forEach(function(button) {
-        button.addEventListener("click", function(event) {
-            // Hiển thị hộp thoại xác nhận
-            const confirmDelete = confirm("Bạn có chắc chắn muốn xóa mặt hàng này khỏi kho không?");
-            
-            // Nếu người dùng bấm Cancel, chặn hành động xóa
-            if (!confirmDelete) {
-                event.preventDefault();
-            }
-        });
+    // 1. Thu thập dữ liệu từ các ô nhập liệu bằng ID
+    const productData = {
+        ma_hang: document.getElementById('ma_hang').value,
+        ten_hang: document.getElementById('ten_hang').value,
+        loai_hang: document.getElementById('loai_hang').value,
+        so_luong: parseInt(document.getElementById('so_luong').value),
+        gia_nhap: parseFloat(document.getElementById('gia_nhap').value)
+    };
+
+    // 2. Gửi request API POST tới Flask
+    fetch('/api/hang-hoa', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Thêm hàng hóa thành công!');
+            window.location.reload(); // Tải lại trang để cập nhật bảng mới
+        } else {
+            alert('Lỗi từ hệ thống: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Không thể kết nối đến server Backend!');
     });
-
 });
