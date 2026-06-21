@@ -57,6 +57,7 @@ function openEditModal(ma, ten, gia, loai) {
     document.getElementById('edit_ma_hang').value = ma;
     document.getElementById('edit_ten').value = ten;
     document.getElementById('edit_gia').value = gia;
+    document.getElementById('edit_loai_hang').value = loai;
     document.getElementById('edit_hsd_container').style.display = (loai === 'ThucPham') ? 'block' : 'none';
     document.getElementById('editModal').style.display = 'block';
 }
@@ -68,7 +69,9 @@ async function luuSua() {
         ten_hang: document.getElementById('edit_ten').value,
         gia_nhap: parseFloat(document.getElementById('edit_gia').value) || 0,
         nhap_them: parseInt(document.getElementById('edit_nhap_them').value) || 0,
-        xuat_ban: parseInt(document.getElementById('edit_xuat_ban').value) || 0
+        xuat_ban: parseInt(document.getElementById('edit_xuat_ban').value) || 0,
+        loai_hang: document.getElementById('edit_loai_hang').value,
+        han_su_dung: document.getElementById('edit_hsd') ? document.getElementById('edit_hsd').value : null
     };
 
     const response = await fetch(`/api/hang-hoa/${ma}`, {
@@ -102,5 +105,49 @@ async function thucHienXoa() {
         location.reload();
     } else {
         alert("Lỗi: " + res.message);
+    }
+}
+
+// 8. Hàm lọc dữ liệu
+async function locDuLieu() {
+    const tuKhoa = document.getElementById('searchInput').value.trim();
+    const tieuChiLoc = document.getElementById('typeFilter').value;
+    const sortValue = document.getElementById('sortOrder').value;
+
+    let bodyData = (tuKhoa !== "" || tieuChiLoc !== "") 
+        ? { action: 'search', keyword: tuKhoa, criteria: tieuChiLoc === "" ? 'all' : tieuChiLoc }
+        : { action: 'sort', tieu_chi: sortValue.split('_')[0], kieu: sortValue.split('_')[1] };
+
+    try {
+        const response = await fetch('/api/sap-xep-tim-kiem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
+        });
+
+        const result = await response.json();
+        console.log("Server phản hồi:", result); // Kiểm tra log này trong F12
+
+        const tbody = document.querySelector('#resultTable tbody');
+        tbody.innerHTML = '';
+
+        // TỰ ĐỘNG CHỌN DANH SÁCH: dù server trả về result.data hay trực tiếp là result (nếu là mảng)
+        const danhSach = Array.isArray(result) ? result : (result.data || []);
+
+        if (danhSach.length > 0) {
+            danhSach.forEach(item => {
+                tbody.innerHTML += `<tr>
+                    <td>${item.ma_hang || 'N/A'}</td>
+                    <td>${item.ten_hang || 'N/A'}</td>
+                    <td>${Number(item.gia_nhap || 0).toLocaleString()} VNĐ</td>
+                    <td>${item.so_luong || 0}</td>
+                </tr>`;
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Không có dữ liệu!</td></tr>';
+        }
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert("Lỗi kết nối server!");
     }
 }

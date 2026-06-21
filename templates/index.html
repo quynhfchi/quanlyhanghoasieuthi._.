@@ -9,6 +9,8 @@
         .tab-section { display: none; }
         .tab-section.active { display: block; }
         .sidebar-menu li { cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 400px; }
     </style>
 </head>
 <body>
@@ -49,15 +51,11 @@
                         </div>
                         <div class="input-wrapper">
                             <label>Số lượng </label>
-                           <input type="number" id="so_luong" value="0" min="0" 
-       onfocus="if(this.value=='0') this.value='';" 
-       onblur="if(this.value=='') this.value='0';" required>
+                            <input type="number" id="so_luong" value="0" min="0" onfocus="if(this.value=='0') this.value='';" onblur="if(this.value=='') this.value='0';" required>
                         </div>
                         <div class="input-wrapper">
                             <label>Giá nhập khẩu (VNĐ)</label>
-                            <input type="number" id="gia_nhap" value="0" min="0" 
-       onfocus="if(this.value=='0') this.value='';" 
-       onblur="if(this.value=='') this.value='0';" required>
+                            <input type="number" id="gia_nhap" value="0" min="0" onfocus="if(this.value=='0') this.value='';" onblur="if(this.value=='') this.value='0';" required>
                         </div>
                     </div>
                     <div class="form-row-2" id="hsd_container" style="display: none; margin-bottom: 20px;">
@@ -66,10 +64,10 @@
                             <input type="date" id="han_su_dung">
                         </div>
                     </div>
-                        <div class="submit-container" style="text-align: center;">
-                    <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
-                    <div id="messageBox" style="margin-top: 15px; font-weight: bold; font-size: 16px;"></div>
-                </div>
+                    <div class="submit-container" style="text-align: center;">
+                        <button type="submit" class="btn-submit">➕ Thêm Vào Kho</button>
+                        <div id="messageBox" style="margin-top: 15px; font-weight: bold; font-size: 16px;"></div>
+                    </div>
                 </form>
             </div>
 
@@ -87,25 +85,24 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                    {% if danh_sach %}
-                        {% for item in danh_sach %}
-                        {% set loai_class = 'row-thuc-pham' if item.loai_hang == 'ThucPham' else ('row-dien-may' if item.loai_hang == 'DienMay' else 'row-gia-dung') %}
-                        <tr class="{{ loai_class }}">
-                            <td><strong>{{ item.ma_hang }}</strong></td>
-                            <td>{{ item.ten_hang }}</td>
-                            <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
-                            <td>{{ item.so_luong }}</td>
-                            <td>{{ item.ngay_nhap }}</td>
-                            <td class="action-cell">
-                                <button class="btn-action btn-edit" onclick="openEditModal('{{ item.ma_hang }}', '{{ item.ten_hang }}', {{ item.gia_nhap }})">✏️ Sửa</button>
-                                <button class="btn-action btn-delete" onclick="xoaHangHoa('{{ item.ma_hang }}')">🗑️ Xóa</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="6" style="text-align: center;">Chưa có sản phẩm.</td></tr>
-                    {% endif %}
-                </tbody>
+                        {% if danh_sach %}
+                            {% for item in danh_sach %}
+                            <tr>
+                                <td><strong>{{ item.ma_hang }}</strong></td>
+                                <td>{{ item.ten_hang }}</td>
+                                <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
+                                <td>{{ item.so_luong }}</td>
+                                <td>{{ item.ngay_nhap }}</td>
+                                <td class="action-cell">
+                                    <button class="btn-action btn-edit" onclick="openEditModal('{{ item.ma_hang }}', '{{ item.ten_hang }}', {{ item.gia_nhap }}, '{{ item.loai_hang }}')">✏️ Sửa</button>
+                                    <button class="btn-action btn-delete" onclick="xoaHangHoa('{{ item.ma_hang }}')">🗑️ Xóa</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="6" style="text-align: center;">Chưa có sản phẩm.</td></tr>
+                        {% endif %}
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -113,6 +110,32 @@
         <div id="tab-tim-kiem" class="tab-section">
             <div class="card">
                 <h2>🔍 Tìm Kiếm & Sắp Xếp</h2>
+                <div class="controls">
+                    <input type="text" id="searchInput" placeholder="Nhập mã hàng hoặc tên...">
+                    <select id="typeFilter">
+                        <option value="">-- Tất cả thể loại --</option>
+                        <option value="ThucPham">Thực phẩm</option>
+                        <option value="DienMay">Điện máy</option>
+                        <option value="GiaDung">Gia dụng</option>
+                    </select>
+                    <select id="sortOrder">
+                        <option value="gia_asc">Giá tăng dần</option>
+                        <option value="gia_desc">Giá giảm dần</option>
+                        <option value="sl_desc">Số lượng tồn kho (Cao đến thấp)</option>
+                    </select>
+                    <button type="button" onclick="locDuLieu()">Lọc dữ liệu</button>
+                </div>
+                <table id="resultTable" class="styled-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa; border-bottom: 2px solid #ddd;">
+                            <th style="padding: 10px; text-align: left;">Mã Hàng</th>
+                            <th style="padding: 10px; text-align: left;">Tên Sản Phẩm</th>
+                            <th style="padding: 10px; text-align: left;">Giá Nhập</th>
+                            <th style="padding: 10px; text-align: left;">Số Lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
 
@@ -125,6 +148,31 @@
         </div>
     </div>
 
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Xác nhận xóa</h3>
+            <p>Xóa mã hàng: <span id="delete_ma_hang_text"></span></p>
+            <input type="hidden" id="delete_ma_hang_val">
+            <button onclick="thucHienXoa()">Xác nhận</button>
+            <button onclick="document.getElementById('deleteModal').style.display='none'">Hủy</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Sửa thông tin</h3>
+            <input type="text" id="edit_ma_hang" readonly>
+            <input type="text" id="edit_ten">
+            <input type="number" id="edit_gia">
+            <select id="edit_loai_hang"><option value="ThucPham">Thực phẩm</option><option value="DienMay">Điện máy</option><option value="GiaDung">Gia dụng</option></select>
+            <input type="number" id="edit_nhap_them" value="0">
+            <input type="number" id="edit_xuat_ban" value="0">
+            <div id="edit_hsd_container" style="display:none;"><input type="date" id="edit_hsd"></div>
+            <button onclick="luuSua()">Lưu</button>
+            <button onclick="document.getElementById('editModal').style.display='none'">Đóng</button>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
         function switchTab(tabId, element) {
@@ -133,96 +181,19 @@
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
         }
-
-        function handleTypeChange(value) {
-            document.getElementById('hsd_container').style.display = (value === 'ThucPham') ? 'block' : 'none';
-        }
-
+        function handleTypeChange(val) { document.getElementById('hsd_container').style.display = (val === 'ThucPham') ? 'block' : 'none'; }
         function openEditModal(ma, ten, gia, loai) {
-    document.getElementById('edit_ma_hang').value = ma;
-    document.getElementById('edit_ten').value = ten;
-    document.getElementById('edit_gia').value = gia;
-    document.getElementById('edit_loai_hang').value = loai;
-    
-    // Hiện ô HSD nếu là thực phẩm
-    document.getElementById('edit_hsd_container').style.display = (loai === 'ThucPham') ? 'block' : 'none';
-    
-    document.getElementById('editModal').style.display = 'block';
-}
-
-function xoaHangHoa(ma) {
-    document.getElementById('delete_ma_hang_text').innerText = ma;
-    document.getElementById('delete_ma_hang_val').value = ma;
-    document.getElementById('deleteModal').style.display = 'block';
-}
-
-function dongModalXoa() { document.getElementById('deleteModal').style.display = 'none'; }
-async function luuSua() {
-    const ma = document.getElementById('edit_ma_hang').value;
-    
-    // Lấy giá trị và ép kiểu ngay tại đây
-    const data = {
-        ten_hang: document.getElementById('edit_ten').value,
-        gia_nhap: parseFloat(document.getElementById('edit_gia').value) || 0,
-        // Dùng || 0 để đảm bảo nếu ô trống thì gửi số 0
-        nhap_them: parseInt(document.getElementById('edit_nhap_them').value) || 0,
-        xuat_ban: parseInt(document.getElementById('edit_xuat_ban').value) || 0
-    };
-
-    try {
-        const response = await fetch(`/api/hang-hoa/${ma}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert("Cập nhật thành công!");
-            location.reload(); 
-        } else {
-            alert("Lỗi: " + result.message); // Hiển thị lỗi từ server trả về
+            document.getElementById('edit_ma_hang').value = ma;
+            document.getElementById('edit_ten').value = ten;
+            document.getElementById('edit_gia').value = gia;
+            document.getElementById('edit_loai_hang').value = loai;
+            document.getElementById('editModal').style.display = 'block';
         }
-    } catch (error) {
-        console.error("Lỗi kết nối:", error);
-        alert("Không thể kết nối tới máy chủ.");
-    }
-}
+        function xoaHangHoa(ma) {
+            document.getElementById('delete_ma_hang_text').innerText = ma;
+            document.getElementById('delete_ma_hang_val').value = ma;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
     </script>
-
-    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-    <div class="modal-content" style="margin:5% auto; width:400px;">
-        <h3>✏️ Chỉnh sửa sản phẩm</h3>
-        <input type="hidden" id="edit_ma_hang">
-        <input type="hidden" id="edit_loai_hang"> <label>Tên sản phẩm:</label> <input type="text" id="edit_ten">
-        <label>Giá nhập:</label> <input type="number" id="edit_gia">
-        
-        <div id="edit_hsd_container" style="display:none;">
-            <label>Hạn sử dụng mới:</label> <input type="date" id="edit_hsd">
-        </div>
-
-        <label>Nhập thêm:</label> 
-        <input type="number" id="edit_nhap_them" value="" placeholder="0" onfocus="this.value=''">
-        
-        <label>Xuất bán:</label> 
-        <input type="number" id="edit_xuat_ban" value="" placeholder="0" onfocus="this.value=''">
-        
-        <div style="text-align:right; margin-top:15px;">
-            <button onclick="dongModal()" class="btn-pill" style="background:#eee;">❌ Hủy</button>
-            <button onclick="luuSua()" class="btn-pill" style="background:#4CAF50; color:white;">💾 Lưu thay đổi</button>
-        </div>
-    </div>
-</div>
-
-<div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-    <div class="modal-content" style="margin:15% auto; width:300px; text-align:center;">
-        <h3 style="color: #ff4d4d;">⚠️ Xác nhận xóa</h3>
-        <p>Bạn muốn xóa sản phẩm <strong id="delete_ma_hang_text"></strong>?</p>
-        <input type="hidden" id="delete_ma_hang_val">
-        <button onclick="dongModalXoa()" class="btn-pill" style="background:#eee;">Không</button>
-        <button onclick="thucHienXoa()" class="btn-pill" style="background:#ff4d4d; color:white;">Xóa ngay</button>
-    </div>
-</div>
 </body>
 </html>

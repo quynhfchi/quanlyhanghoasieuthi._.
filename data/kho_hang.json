@@ -608,7 +608,19 @@
         "han_su_dung": "2026-06-20",
         "ngay_nhap": "2026-06-19",
         "da_ban": 3,
-        "sap_het_han": true,
+        "sap_het_han": false,
+        "het_hang": false
+    },
+    {
+        "ma_hang": "TP20",
+        "ten_hang": "Sữa chua sấy thăng hoa ",
+        "loai_hang": "ThucPham",
+        "so_luong": 17,
+        "gia_nhap": 20000.0,
+        "han_su_dung": "2030-06-23",
+        "ngay_nhap": "2026-06-21",
+        "da_ban": 0,
+        "sap_het_han": false,
         "het_hang": false
     }
 ]
