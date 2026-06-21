@@ -106,13 +106,18 @@ def handling_features():
         return jsonify({"success": True, "data": ket_qua})
 
     elif action == 'search':
-        tu_khoa = data.get('keyword', '')
+        tu_khoa = data.get('keyword', '').strip()
         tieu_chi = data.get('criteria', 'all')
-        if tieu_chi == "ma_hang":
-            ket_qua = quan_ly_kho.tim_kiem_nhi_phan_theo_ma(tu_khoa)
+        
+        if not tu_khoa and tieu_chi == 'all':
+            ket_qua = quan_ly_kho.lay_tat_ca()
         else:
-            ket_qua = quan_ly_kho.tim_kiem_tuyen_tinh(tu_khoa, tieu_chi)
-        return jsonify({"success": True, "data": ket_qua})
+            if tieu_chi == "ma_hang":
+                ket_qua = quan_ly_kho.tim_kiem_nhi_phan_theo_ma(tu_khoa)
+            else:
+                ket_qua = quan_ly_kho.tim_kiem_tuyen_tinh(tu_khoa, tieu_chi)
+        
+        return jsonify({"success": True, "data": ket_qua if ket_qua else []})
 
     return jsonify({"success": False, "message": "Action không hợp lệ"}), 400
 
