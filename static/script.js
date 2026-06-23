@@ -151,3 +151,40 @@ async function locDuLieu() {
         alert("Lỗi kết nối server!");
     }
 }
+// Vẽ biểu đồ khi trang đã tải xong
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('myChart');
+    
+    if(ctx && window.chartDataFromFlask) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: window.chartDataFromFlask.labels,
+                datasets: [
+                    {
+                        label: 'Số lượng Tồn Kho',
+                        data: window.chartDataFromFlask.tonKho,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Số lượng Đã Bán',
+                        data: window.chartDataFromFlask.daBan,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});

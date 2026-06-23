@@ -115,3 +115,12 @@ class DoublyLinkedList:
                 return True
             current = current.next
         return False
+    
+    def update_by_id(self, ma_hang, new_data):
+        current = self.head
+        while current:
+            if current.data.get("ma_hang") == ma_hang:
+                current.data = new_data
+                return True
+            current = current.next
+        return False

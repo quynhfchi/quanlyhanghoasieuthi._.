@@ -2,11 +2,12 @@ from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from services.quan_ly_hang import QuanLyHangHoa
 from utils.exceptions import DuplicateIDError, FileStorageError
-
+from utils.statistics import Statistics 
 app = Flask(__name__)
 
 try:
     quan_ly_kho = QuanLyHangHoa()
+    thong_ke_tool = Statistics() 
 except Exception as e:
     print(f"Loi khoi tao: {str(e)}")
     exit(1)
@@ -43,56 +44,16 @@ def xoa_hang_hoa(ma_hang):
 
 @app.route('/')
 def home():
-    danh_sach = quan_ly_kho.lay_tat_ca()
-    ngay_hien_tai = datetime.now().date()
+    danh_sach_dll = quan_ly_kho.kho_hang
+    danh_sach_hien_thi = danh_sach_dll.to_list()
 
-    so_luong_sap_het_han = 0
-    gia_cao_nhat = 0
-    gia_thap_nhat = float('inf') if danh_sach else 0
-    mat_hang_ban_chay = "Chưa có"
-    mat_hang_ban_it = "Chưa có"
-    max_ban = -1
-    min_ban = float('inf') if danh_sach else 0
+    thong_ke_data = thong_ke_tool.tao_dashboard_data(danh_sach_dll)
 
-    for item in danh_sach:
-        item["sap_het_han"] = False
-        item["het_hang"] = (int(item.get("so_luong", 0)) == 0)
-
-        if item.get("loai_hang") == "ThucPham" and item.get("han_su_dung"):
-            try:
-                hsd = datetime.strptime(str(item["han_su_dung"]), "%Y-%m-%d").date()
-                if 0 <= (hsd - ngay_hien_tai).days <= 30:
-                    item["sap_het_han"] = True
-                    so_luong_sap_het_han += 1
-            except ValueError:
-                pass
-
-        gia = float(item.get("gia_nhap", 0))
-        if gia > gia_cao_nhat: gia_cao_nhat = gia
-        if gia < gia_thap_nhat: gia_thap_nhat = gia
-
-        da_ban = int(item.get("da_ban", 0))
-        if da_ban > max_ban:
-            max_ban = da_ban
-            mat_hang_ban_chay = item["ten_hang"]
-        if da_ban < min_ban:
-            min_ban = da_ban
-            mat_hang_ban_it = item["ten_hang"]
-
-    if not danh_sach: gia_thap_nhat = 0
-
-    thong_ke_data = {
-        "labels": [item.get("ten_hang", "Không tên") for item in danh_sach],
-        "ton_kho": [item.get("so_luong", 0) for item in danh_sach],
-        "da_ban": [item.get("da_ban", 0) for item in danh_sach],
-        "sap_het_han_count": so_luong_sap_het_han,
-        "gia_max": gia_cao_nhat,
-        "gia_min": gia_thap_nhat,
-        "ban_chay": mat_hang_ban_chay,
-        "ban_it": mat_hang_ban_it
-    }
-
-    return render_template('index.html', danh_sach=danh_sach, thong_ke=thong_ke_data)
+    return render_template(
+        'index.html',
+        danh_sach=danh_sach_hien_thi,
+        thong_ke=thong_ke_data
+    )
 
 @app.route('/api/sap-xep-tim-kiem', methods=['POST'])
 def handling_features():
