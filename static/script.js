@@ -53,61 +53,80 @@ function handleTypeChange(value) {
 }
 
 // 4. Hàm mở Modal Sửa
-function openEditModal(ma, ten, gia, loai) {
-    document.getElementById('edit_ma_hang').value = ma;
-    document.getElementById('edit_ten').value = ten;
-    document.getElementById('edit_gia').value = gia;
-    document.getElementById('edit_loai_hang').value = loai;
-    document.getElementById('edit_hsd_container').style.display = (loai === 'ThucPham') ? 'block' : 'none';
-    document.getElementById('editModal').style.display = 'block';
+function openDeleteModal(ma_hang) {
+    document.getElementById('delete_ma_hang_text').innerText = ma_hang;
+    document.getElementById('deleteModal').style.display = 'block';
+    window.currentDeleteID = ma_hang; // Lưu tạm để gọi hàm xóa
 }
 
 // 5. Hàm Lưu Sửa
-async function luuSua() {
-    const ma = document.getElementById('edit_ma_hang').value;
+function luuSua() {
+    const ma_hang = document.getElementById('edit_ma_hang').value;
     const data = {
         ten_hang: document.getElementById('edit_ten').value,
-        gia_nhap: parseFloat(document.getElementById('edit_gia').value) || 0,
-        nhap_them: parseInt(document.getElementById('edit_nhap_them').value) || 0,
-        xuat_ban: parseInt(document.getElementById('edit_xuat_ban').value) || 0,
+        gia_nhap: document.getElementById('edit_gia').value,
         loai_hang: document.getElementById('edit_loai_hang').value,
-        han_su_dung: document.getElementById('edit_hsd') ? document.getElementById('edit_hsd').value : null
+        nhap_them: document.getElementById('edit_nhap_them').value || 0,
+        xuat_ban: document.getElementById('edit_xuat_ban').value || 0
     };
 
-    const response = await fetch(`/api/hang-hoa/${ma}`, {
+    fetch(`/api/hang-hoa/${ma_hang}`, {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+        if(result.success) {
+            location.reload(); // Tải lại trang để cập nhật danh sách
+        } else {
+            alert(result.message);
+        }
     });
-    
-    const res = await response.json();
-    if(res.success) {
-        alert("Cập nhật thành công!");
-        location.reload();
-    } else {
-        alert("Lỗi: " + res.message);
-    }
 }
-
 // 6. Hàm mở Modal Xóa
-function xoaHangHoa(ma) {
-    document.getElementById('delete_ma_hang_text').innerText = ma;
+function xoaHangHoa(ma, ten) {
+
     document.getElementById('delete_ma_hang_val').value = ma;
+
+    document.getElementById('delete_ma_hang_text').innerText =
+        ma + " - " + ten;
+
     document.getElementById('deleteModal').style.display = 'block';
 }
 
 // 7. Hàm Thực hiện Xóa
-async function thucHienXoa() {
-    const ma = document.getElementById('delete_ma_hang_val').value;
-    const response = await fetch(`/api/hang-hoa/${ma}`, { method: 'DELETE' });
-    const res = await response.json();
-    if(res.success) {
-        location.reload();
-    } else {
-        alert("Lỗi: " + res.message);
-    }
-}
+function thucHienXoa() {
 
+    const ma_hang =
+        document.getElementById('delete_ma_hang_val').value;
+
+    fetch(`/api/hang-hoa/${ma_hang}`, {
+        method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.success) {
+
+            document.getElementById('deleteModal').style.display = 'none';
+
+            location.reload();
+
+        } else {
+
+            alert(data.message);
+
+        }
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Lỗi kết nối server");
+
+    });
+}
 // 8. Hàm lọc dữ liệu
 async function locDuLieu() {
     const tuKhoa = document.getElementById('searchInput').value.trim();

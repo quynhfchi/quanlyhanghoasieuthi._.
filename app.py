@@ -46,15 +46,16 @@ def xoa_hang_hoa(ma_hang):
 def home():
     danh_sach_dll = quan_ly_kho.kho_hang
     danh_sach_hien_thi = danh_sach_dll.to_list()
-
+    
     thong_ke_data = thong_ke_tool.tao_dashboard_data(danh_sach_dll)
+    if thong_ke_data is None:
+        thong_ke_data = {"labels": [], "ton_kho": [], "da_ban": [], "tong_so_hang": 0}
 
     return render_template(
         'index.html',
         danh_sach=danh_sach_hien_thi,
         thong_ke=thong_ke_data
     )
-
 @app.route('/api/sap-xep-tim-kiem', methods=['POST'])
 def handling_features():
     data = request.get_json()

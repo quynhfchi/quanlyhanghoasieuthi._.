@@ -103,25 +103,40 @@
                             <th>Thao Tác</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                        {% if danh_sach %}
-                            {% for item in danh_sach %}
-                            <tr>
-                                <td><strong>{{ item.ma_hang }}</strong></td>
-                                <td>{{ item.ten_hang }}</td>
-                                <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
-                                <td>{{ item.so_luong }}</td>
-                                <td>{{ item.ngay_nhap }}</td>
-                                <td class="action-cell">
-                                    <button class="btn-action btn-edit" onclick="openEditModal('{{ item.ma_hang }}', '{{ item.ten_hang }}', '{{ item.gia_nhap }}', '{{ item.loai_hang }}')">✏️ Sửa</button>
-                                    <button class="btn-action btn-delete" onclick="xoaHangHoa('{{ item.ma_hang }}')">🗑️ Xóa</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr><td colspan="6" style="text-align: center;">Chưa có sản phẩm.</td></tr>
-                        {% endif %}
-                    </tbody>
+              <tbody id="tableBody">
+    {% for item in danh_sach %}
+    <tr class="row-{{ item.loai_hang }}">
+        <td><strong>{{ item.ma_hang }}</strong></td>
+        <td>{{ item.ten_hang }}</td>
+        <td>{{ "{:,.0f}".format(item.gia_nhap|float) }} VNĐ</td>
+        <td>{{ item.so_luong }}</td>
+        <td>{{ item.ngay_nhap }}</td>
+       <td class="action-cell">
+
+    <button
+        class="btn-action btn-edit"
+        onclick="openEditModal(
+            '{{ item.ma_hang }}',
+            '{{ item.ten_hang }}',
+            '{{ item.gia_nhap }}',
+            '{{ item.loai_hang }}'
+        )">
+        ✏️ Sửa
+    </button>
+
+    <button
+        class="btn-action btn-delete"
+        onclick="xoaHangHoa(
+            '{{ item.ma_hang }}',
+            '{{ item.ten_hang }}'
+        )">
+        🗑️ Xóa
+    </button>
+
+</td>
+    </tr>
+    {% endfor %}
+</tbody>
                 </table>
             </div>
         </div>
@@ -234,34 +249,110 @@
         </div>
     </div>
 
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3>Xác nhận xóa</h3>
-            <p>Xóa mã hàng: <span id="delete_ma_hang_text"></span></p>
-            <input type="hidden" id="delete_ma_hang_val">
-            <button onclick="thucHienXoa()">Xác nhận</button>
-            <button onclick="document.getElementById('deleteModal').style.display='none'">Hủy</button>
-        </div>
-    </div>
+  <div id="deleteModal" class="modal">
+    <div class="modal-content" style="width: 380px; text-align: center;">
+        <h3>⚠️ Xác nhận xóa</h3>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Sửa thông tin</h3>
-            <input type="text" id="edit_ma_hang" readonly>
-            <input type="text" id="edit_ten">
-            <input type="number" id="edit_gia">
-            <select id="edit_loai_hang">
-                <option value="ThucPham">Thực phẩm</option>
-                <option value="DienMay">Điện máy</option>
-                <option value="GiaDung">Gia dụng</option>
-            </select>
-            <input type="number" id="edit_nhap_them" value="0" placeholder="Nhập thêm">
-            <input type="number" id="edit_xuat_ban" value="0" placeholder="Xuất bán">
-            <div id="edit_hsd_container" style="display:none;"><input type="date" id="edit_hsd"></div>
-            <button onclick="luuSua()">Lưu</button>
-            <button onclick="document.getElementById('editModal').style.display='none'">Đóng</button>
+        <p style="margin:15px 0;">
+            Bạn có chắc chắn muốn xóa sản phẩm:
+        </p>
+
+        <div id="delete_ma_hang_text"
+             style="
+                background:#fff1f2;
+                color:#be123c;
+                padding:12px;
+                border-radius:12px;
+                font-weight:bold;
+                margin-bottom:12px;
+             ">
+        </div>
+
+        <p style="font-size:13px;color:#666;">
+            Hành động này không thể hoàn tác.
+        </p>
+
+        <input type="hidden" id="delete_ma_hang_val">
+
+        <div style="margin-top:20px;">
+            <button class="btn-pill btn-delete"
+                    onclick="thucHienXoa()">
+                Xác nhận
+            </button>
+
+            <button class="btn-pill"
+                    onclick="document.getElementById('deleteModal').style.display='none'">
+                Hủy
+            </button>
         </div>
     </div>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content edit-modal">
+
+        <h3>✏️ Sửa thông tin sản phẩm</h3>
+
+        <div class="edit-grid">
+
+            <div class="input-wrapper">
+                <label>Mã hàng</label>
+                <input type="text" id="edit_ma_hang" readonly>
+            </div>
+
+            <div class="input-wrapper">
+                <label>Tên sản phẩm</label>
+             <input type="text" id="edit_ten" readonly>
+            </div>
+
+            <div class="input-wrapper">
+                <label>Giá nhập</label>
+                <input type="number" id="edit_gia">
+            </div>
+
+            <div class="input-wrapper">
+                <label>Loại hàng</label>
+              <select id="edit_loai_hang" disabled>
+    <option value="ThucPham">Thực phẩm</option>
+    <option value="DienMay">Điện máy</option>
+    <option value="GiaDung">Gia dụng</option>
+</select>
+            </div>
+
+            <div class="input-wrapper">
+                <label>Nhập thêm</label>
+               <input
+    type="number"
+    id="edit_nhap_them"
+    value="0"
+    onfocus="if(this.value=='0') this.value='';"
+    onblur="if(this.value=='') this.value='0';">            </div>
+
+            <div class="input-wrapper">
+                <label>Xuất bán</label>
+                <input
+    type="number"
+    id="edit_xuat_ban"
+    value="0"
+    onfocus="if(this.value=='0') this.value='';"
+    onblur="if(this.value=='') this.value='0';">            </div>
+
+        </div>
+
+        <div class="edit-buttons">
+            <button class="btn-pill btn-edit" onclick="luuSua()">
+                💾 Lưu
+            </button>
+
+            <button
+                class="btn-pill btn-delete"
+                onclick="document.getElementById('editModal').style.display='none'">
+                ✖ Đóng
+            </button>
+        </div>
+
+    </div>
+</div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     
@@ -281,16 +372,22 @@
             document.getElementById('edit_loai_hang').value = loai;
             document.getElementById('editModal').style.display = 'block';
         }
-        function xoaHangHoa(ma) {
-            document.getElementById('delete_ma_hang_text').innerText = ma;
-            document.getElementById('delete_ma_hang_val').value = ma;
-            document.getElementById('deleteModal').style.display = 'block';
-        }
+    function xoaHangHoa(ma, ten) {
+
+    document.getElementById('delete_ma_hang_text').innerText =
+        ma + " - " + ten;
+
+    document.getElementById('delete_ma_hang_val').value = ma;
+
+    window.currentDeleteID = ma;
+
+    document.getElementById('deleteModal').style.display = 'block';
+}
     </script>
 
     <script>
-      
-        const thongKe = {{ thong_ke | tojson | safe }};
+
+    console.log('Dữ liệu thongKe:', {{ thong_ke | tojson | safe }});
         
 
         const ctx = document.getElementById('myChart');
