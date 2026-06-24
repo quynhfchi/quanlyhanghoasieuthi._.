@@ -51,37 +51,29 @@ def home():
     if thong_ke_data is None:
         thong_ke_data = {"labels": [], "ton_kho": [], "da_ban": [], "tong_so_hang": 0}
 
+    print(f"DEBUG DATA: {type(thong_ke_data)} - {thong_ke_data}")
+
     return render_template(
         'index.html',
         danh_sach=danh_sach_hien_thi,
         thong_ke=thong_ke_data
     )
+
 @app.route('/api/sap-xep-tim-kiem', methods=['POST'])
 def handling_features():
     data = request.get_json()
-    action = data.get('action')
-
-    if action == 'sort':
-        tieu_chi = data.get('tieu_chi')
-        kieu_sap_xep = data.get('kieu')
-        ket_qua = quan_ly_kho.sap_xep(tieu_chi, reverse=(kieu_sap_xep == 'desc'))
-        return jsonify({"success": True, "data": ket_qua})
-
-    elif action == 'search':
-        tu_khoa = data.get('keyword', '').strip()
-        tieu_chi = data.get('criteria', 'all')
-        
-        if not tu_khoa and tieu_chi == 'all':
-            ket_qua = quan_ly_kho.lay_tat_ca()
-        else:
-            if tieu_chi == "ma_hang":
-                ket_qua = quan_ly_kho.tim_kiem_nhi_phan_theo_ma(tu_khoa)
-            else:
-                ket_qua = quan_ly_kho.tim_kiem_tuyen_tinh(tu_khoa, tieu_chi)
-        
-        return jsonify({"success": True, "data": ket_qua if ket_qua else []})
-
-    return jsonify({"success": False, "message": "Action không hợp lệ"}), 400
+    sort_type = data.get('sort_type', '') 
+    ket_qua = quan_ly_kho.tim_kiem_don_gian(data.get('keyword', ''), data.get('criteria', 'all'))
+    print (f"DEBUG: Dữ liệu nhận từ tim_kiem_don_gian: {ket_qua[:2]}"
+           )
+    if sort_type == 'gia_asc':
+        ket_qua = sorted(ket_qua, key=lambda x: float(x.get('gia_nhap', 0)), reverse=False)
+    elif sort_type == 'gia_desc':
+        ket_qua = sorted(ket_qua, key=lambda x: float(x.get('gia_nhap', 0)), reverse=True)
+    elif sort_type == 'sl_desc':
+        ket_qua = sorted(ket_qua, key=lambda x: float(x.get('so_luong', 0)), reverse=True)
+            
+    return jsonify({"success": True, "data": ket_qua})
 
 if __name__ == '__main__':
     app.run(debug=True)

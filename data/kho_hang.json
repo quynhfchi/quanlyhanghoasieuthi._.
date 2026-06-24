@@ -1,27 +1,5 @@
 [
     {
-        "ma_hang": "DM01",
-        "ten_hang": "Tủ lạnh Inverter",
-        "loai_hang": "DienMay",
-        "so_luong": 3,
-        "gia_nhap": 12590000.0,
-        "da_ban": 3,
-        "ngay_nhap": "2026-05-10",
-        "han_su_dung": null,
-        "sap_het_han": false,
-        "het_hang": false
-    },
-    {
-        "ma_hang": "TP01",
-        "ten_hang": "Mì tôm Hảo Hảo",
-        "loai_hang": "ThucPham",
-        "so_luong": 50,
-        "gia_nhap": 3500.0,
-        "han_su_dung": "2028-01-20",
-        "ngay_nhap": "2026-06-23",
-        "da_ban": 0
-    },
-    {
         "ma_hang": "TP01",
         "ten_hang": "Sữa tươi Vinamilk",
         "loai_hang": "ThucPham",

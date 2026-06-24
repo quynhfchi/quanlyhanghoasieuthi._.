@@ -127,47 +127,60 @@ function thucHienXoa() {
 
     });
 }
-// 8. Hàm lọc dữ liệu
+// Hàm lọc dữ liệu
 async function locDuLieu() {
-    const tuKhoa = document.getElementById('searchInput').value.trim();
-    const tieuChiLoc = document.getElementById('typeFilter').value;
-    const sortValue = document.getElementById('sortOrder').value;
+    const searchInput = document.getElementById('searchInput').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const tbody = document.querySelector('#resultTable tbody');
 
-    let bodyData = (tuKhoa !== "" || tieuChiLoc !== "") 
-        ? { action: 'search', keyword: tuKhoa, criteria: tieuChiLoc === "" ? 'all' : tieuChiLoc }
-        : { action: 'sort', tieu_chi: sortValue.split('_')[0], kieu: sortValue.split('_')[1] };
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Đang tải...</td></tr>';
 
     try {
         const response = await fetch('/api/sap-xep-tim-kiem', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bodyData)
+            body: JSON.stringify({
+                action: 'sort',
+                keyword: searchInput,
+                criteria: typeFilter || 'all',
+                sort_type: document.getElementById('sortOrder').value 
+            })
         });
 
         const result = await response.json();
-        console.log("Server phản hồi:", result); // Kiểm tra log này trong F12
-
-        const tbody = document.querySelector('#resultTable tbody');
         tbody.innerHTML = '';
 
-        // TỰ ĐỘNG CHỌN DANH SÁCH: dù server trả về result.data hay trực tiếp là result (nếu là mảng)
-        const danhSach = Array.isArray(result) ? result : (result.data || []);
-
-        if (danhSach.length > 0) {
-            danhSach.forEach(item => {
-                tbody.innerHTML += `<tr>
-                    <td>${item.ma_hang || 'N/A'}</td>
-                    <td>${item.ten_hang || 'N/A'}</td>
-                    <td>${Number(item.gia_nhap || 0).toLocaleString()} VNĐ</td>
-                    <td>${item.so_luong || 0}</td>
-                </tr>`;
-            });
+        if (result.success && Array.isArray(result.data)) {
+            tbody.innerHTML = '';
+            if (result.data.length > 0) {
+                let rows = "";
+                result.data.forEach(item => {
+                    let giaValue = parseFloat(item.gia_nhap) || 0;
+                    let giaDisplay = giaValue.toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    let rowClass = "";
+                    if (item.loai_hang === "Thực phẩm") rowClass = "row-ThucPham";
+                    else if (item.loai_hang === "Điện máy") rowClass = "row-DienMay";
+                    else if (item.loai_hang === "Gia dụng") rowClass = "row-GiaDung";
+                    
+                    rows += `<tr class="row-${item.loai_hang}"> <td>${item.ma_hang}</td>
+                        <td>${item.ten_hang}</td>
+                        <td>${giaDisplay}</td> 
+                        <td>${item.so_luong}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = rows;
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Không tìm thấy kết quả.</td></tr>';
+            }
         } else {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Không có dữ liệu!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Dữ liệu lỗi!</td></tr>';
         }
-    } catch (error) {
-        console.error("Lỗi:", error);
-        alert("Lỗi kết nối server!");
+    } catch (err) {
+        console.error("Lỗi:", err);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi!</td></tr>';
     }
 }
 // Vẽ biểu đồ khi trang đã tải xong
@@ -207,3 +220,69 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+// Hàm cập nhật bảng
+function capNhatBang(danhSach) {
+    const tbody = document.querySelector('#resultTable tbody');
+    tbody.innerHTML = ''; 
+
+    if (danhSach && danhSach.length > 0) {
+        let rows = ""; 
+        
+        danhSach.forEach(item => {
+            let giaValue = parseFloat(item.gia_nhap) || 0;
+            let giaDisplay = giaValue.toLocaleString('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            
+            rows += `<tr>
+                <td>${item.ma_hang}</td>
+                <td>${item.ten_hang}</td>
+                <td>${giaDisplay} VNĐ</td>
+                <td>${item.so_luong}</td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = rows; 
+    } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Không có dữ liệu.</td></tr>';
+    }
+}
+
+
+// Hàm xử lý chức năng
+async function xuLyChucNang(action) {
+    const sortOrder = document.getElementById('sortOrder')?.value || 'gia_asc';
+
+    const data = {
+        action: action,
+        keyword: document.getElementById('searchInput').value,
+        criteria: document.getElementById('typeFilter').value,
+        sort_type: sortOrder 
+    };
+
+    const response = await fetch('/api/sap-xep-tim-kiem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        capNhatBang(result.data); 
+    }
+}
+
+// Tự động tô màu lại mỗi khi bảng danh sách thay đổi
+const observer = new MutationObserver(() => {
+    document.querySelectorAll('#resultTable tbody tr').forEach(row => {
+        if (!row.cells[3]) return; 
+        const txt = row.cells[3].innerText;
+        if (txt.includes("Thực phẩm")) row.style.backgroundColor = "#d1fae5";
+        else if (txt.includes("Điện máy")) row.style.backgroundColor = "#fee2e2";
+        else if (txt.includes("Gia dụng")) row.style.backgroundColor = "#fef3c7";
+    });
+});
+const target = document.getElementById('resultTable');
+if (target) observer.observe(target, { childList: true, subtree: true });

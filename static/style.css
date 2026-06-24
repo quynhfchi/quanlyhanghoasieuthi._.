@@ -355,3 +355,59 @@ input[type="number"], input[type="text"], input[type="date"], select {
 #delete_product_info {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.result-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Tô màu đỏ nhạt cho dòng tồn kho thấp - Dùng class này trong JS */
+.low-stock-row {
+    background-color: #f8d7da; 
+    color: #842029;
+}
+
+
+/* Phần tô màu của tìm kiếm và sắp xếp */
+.custom-filter-box {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto; 
+    gap: 15px;
+    align-items: end; 
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+}
+
+.custom-filter-box input, 
+.custom-filter-box select {
+    width: 100%;
+    height: 42px;
+    padding: 0 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+}
+
+.custom-filter-box button {
+    height: 42px;
+    padding: 0 25px;
+    background-color: #1e293b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+tr:has(td:nth-child(4):contains("Thực phẩm")) { background-color: #d1fae5 !important; }
+tr:has(td:nth-child(4):contains("Điện máy"))   { background-color: #fee2e2 !important; }
+tr:has(td:nth-child(4):contains("Gia dụng"))   { background-color: #fef3c7 !important; }

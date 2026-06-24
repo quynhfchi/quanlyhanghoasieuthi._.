@@ -64,5 +64,31 @@ class QuanLyHangHoa:
         return False
 
     def sap_xep(self, key, reverse=False):
-        self.kho_hang.sort(key=key, reverse=reverse)
+        def cleanup_key(item):
+            val = item.get(key, "")
+            if key in ["gia_nhap", "so_luong"]:
+                try:
+                    return float(str(val).replace(",", "").replace(".", ""))
+                except (ValueError, TypeError):
+                    return 0.0
+            return str(val).lower() if val else ""
+            
+        self.kho_hang.sort(key=cleanup_key, reverse=reverse)
         return self.kho_hang.to_list()
+    
+    def tim_kiem_don_gian(self, tu_khoa, tieu_chi):
+        ket_qua = []
+        danh_sach = self.kho_hang.to_list()
+        tu_khoa = tu_khoa.lower()
+
+        for item in danh_sach:
+            ma_hang = str(item.get("ma_hang", "")).lower()
+            ten_hang = str(item.get("ten_hang", "")).lower()
+            loai_hang = item.get("loai_hang", "")
+
+            match_keyword = (tu_khoa in ma_hang or tu_khoa in ten_hang)
+            match_criteria = (tieu_chi == "all" or loai_hang == tieu_chi)
+
+            if match_keyword and match_criteria:
+                ket_qua.append(item)
+        return ket_qua

@@ -144,7 +144,7 @@
         <div id="tab-tim-kiem" class="tab-section">
             <div class="card">
                 <h2>🔍 Tìm Kiếm & Sắp Xếp</h2>
-                <div class="controls">
+                <div class="custom-filter-box">
                     <input type="text" id="searchInput" placeholder="Nhập mã hàng hoặc tên...">
                     <select id="typeFilter">
                         <option value="">-- Tất cả thể loại --</option>
@@ -157,7 +157,7 @@
                         <option value="gia_desc">Giá giảm dần</option>
                         <option value="sl_desc">Số lượng tồn kho (Cao đến thấp)</option>
                     </select>
-                    <button type="button" onclick="locDuLieu()">Lọc dữ liệu</button>
+                    <button type="button" class="btn-pill" onclick="locDuLieu()">Lọc dữ liệu</button> 
                 </div>
                 <table id="resultTable" class="styled-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                     <thead>
@@ -412,7 +412,6 @@
     </script>
 
     <script>
-        const thongKe = {{ thong_ke | tojson | safe }};
         console.log('Dữ liệu thongKe:', thongKe);
         
         const ctx = document.getElementById('myChart');
