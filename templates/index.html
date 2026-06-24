@@ -178,43 +178,42 @@
                 <h2 style="margin-bottom: 20px;">📊 Bảng Điều Khiển Tổng Quan</h2>
                 
                 <div class="dashboard-cards">
-                    <div class="stat-card warning">
-                        <div class="stat-title">⚠️ Sắp hết hạn</div>
-                        <div class="stat-value" style="color: #d35400;">{{ thong_ke.sap_het_han_count }} <span style="font-size: 14px;">mục</span></div>
-                    </div>
-                    <div class="stat-card success">
-                        <div class="stat-title">🔥 Bán chạy nhất</div>
-                        <div class="stat-value" style="color: #1e8449;">{{ thong_ke.ban_chay }}</div>
-                    </div>
-                    <div class="stat-card danger">
-                        <div class="stat-title">📦 Đại diện tồn đọng</div>
-                        <div class="stat-value" style="color: #922b21;">{{ thong_ke.ban_it }}</div>
-                    </div>
-                    
-                    <div class="stat-card info-1">
+                    <div class="stat-card info-1" style="flex: 1;">
                         <div class="stat-title">📦 Tổng mặt hàng</div>
                         <div class="stat-value">{{ thong_ke.tong_so_hang }}</div>
                     </div>
-                    <div class="stat-card info-2">
+                    <div class="stat-card warning" style="flex: 1;">
+                        <div class="stat-title">⚠️ Sắp hết hàng</div>
+                        <div class="stat-value">{{ thong_ke.sap_het_han_count }}</div>
+                    </div>
+                    <div class="stat-card" style="border-bottom: 5px solid #c0392b; background: #fadbd8; flex: 1;">
+                        <div class="stat-title">💎 Mặt hàng Đắt nhất</div>
+                        <div class="stat-value" style="font-size: 16px;">{{ thong_ke.hang_dat_nhat }}</div>
+                    </div>
+                    <div class="stat-card success" style="flex: 1;">
+                        <div class="stat-title">🏷️ Mặt hàng Rẻ nhất</div>
+                        <div class="stat-value" style="font-size: 16px;">{{ thong_ke.hang_re_nhat }}</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="stat-card info-2" style="flex: 1;">
                         <div class="stat-title">🧮 Tổng tồn kho</div>
                         <div class="stat-value">{{ thong_ke.tong_ton_kho }}</div>
                     </div>
-                    <div class="stat-card info-3">
-                        <div class="stat-title">💰 Giá trị kho</div>
-                        <div class="stat-value">{{ "{:,.0f}".format(thong_ke.tong_gia_tri|float) }} VNĐ</div>
+                    <div class="stat-card info-3" style="flex: 1;">
+                        <div class="stat-title">💰 Giá trị vốn kho</div>
+                        <div class="stat-value" style="font-size: 20px;">{{ "{:,.0f}".format(thong_ke.tong_gia_tri|float) }} ₫</div>
+                    </div>
+                    <div class="stat-card" style="border-bottom: 5px solid #8e44ad; background: #f4ecf8; flex: 1;">
+                        <div class="stat-title">🔥 Bán chạy nhất</div>
+                        <div class="stat-value" style="font-size: 18px;">{{ thong_ke.ban_chay }}</div>
                     </div>
                 </div>
 
-                <div class="chart-container">
-                    <h3 style="text-align: center; color: #444; margin-bottom: 20px;">Biểu Đồ Tương Quan Tồn Kho & Đã Bán</h3>
-                    <div style="height: 400px;">
-                        <canvas id="myChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="detail-list">
+                <div class="detail-list" style="margin-bottom: 30px;">
                     <div class="detail-card">
-                        <h3 style="color: #d35400; margin-top: 0;">⚠️ Danh sách sắp hết hạn</h3>
+                        <h3 style="color: #d35400; margin-top: 0;">⚠️ Danh sách sắp hết hàng </h3>
                         <ul>
                             {% if thong_ke.sap_het %}
                                 {% for item in thong_ke.sap_het %}
@@ -224,11 +223,10 @@
                                 </li>
                                 {% endfor %}
                             {% else %}
-                                <li style="color: #27ae60;">Không có mặt hàng nào sắp hết hạn.</li>
+                                <li style="color: #27ae60;">Đủ hàng, không cần nhập thêm.</li>
                             {% endif %}
                         </ul>
                     </div>
-
                     <div class="detail-card">
                         <h3 style="color: #c0392b; margin-top: 0;">📦 Danh sách hàng tồn đọng</h3>
                         <ul>
@@ -236,13 +234,41 @@
                                 {% for item in thong_ke.hang_ton_dong %}
                                 <li>
                                     <span><strong>{{ item.ten_hang }}</strong> ({{ item.ma_hang }})</span>
-                                    <span style="color: red; font-weight: bold;">SL: {{ item.so_luong }}</span>
+                                    <span style="color: #922b21; font-weight: bold;">SL: {{ item.so_luong }}</span>
                                 </li>
                                 {% endfor %}
                             {% else %}
                                 <li style="color: #27ae60;">Kho hàng lưu thông tốt.</li>
                             {% endif %}
                         </ul>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📋 Danh sách chi tiết toàn bộ mặt hàng</h3>
+                    <table class="styled-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Tên sản phẩm</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Tồn kho</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ddd;">Đã bán</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in danh_sach %}
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ item.ten_hang }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ item.so_luong }}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ item.da_ban }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-container">
+                    <h3 style="text-align: center; color: #444; margin-bottom: 20px;">Biểu Đồ Tương Quan Tồn Kho & Đã Bán</h3>
+                    <div style="height: 400px;">
+                        <canvas id="myChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -386,10 +412,9 @@
     </script>
 
     <script>
-
-    console.log('Dữ liệu thongKe:', {{ thong_ke | tojson | safe }});
+        const thongKe = {{ thong_ke | tojson | safe }};
+        console.log('Dữ liệu thongKe:', thongKe);
         
-
         const ctx = document.getElementById('myChart');
         if (ctx && thongKe.labels) {
             new Chart(ctx, {
