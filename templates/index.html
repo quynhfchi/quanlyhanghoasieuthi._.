@@ -412,6 +412,7 @@
     </script>
 
     <script>
+        const thongKe = {{ thong_ke | tojson | safe }};
         console.log('Dữ liệu thongKe:', thongKe);
         
         const ctx = document.getElementById('myChart');
